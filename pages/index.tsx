@@ -1,8 +1,9 @@
-import Head from 'next/head'
+import Head from 'next/head';
 // import Image from 'next/image'
-import { Averia_Sans_Libre } from '@next/font/google'
+import { z } from 'zod';
+import { Averia_Sans_Libre } from '@next/font/google';
 
-const averia = Averia_Sans_Libre({ weight: ['400', '700'], subsets: ['latin'] })
+const averia = Averia_Sans_Libre({ weight: ['400', '700'], subsets: ['latin'] });
 
 export default function Home() {
     return (
@@ -21,5 +22,5 @@ export default function Home() {
                 <h1 className="font-bold text-9xl">Hello world</h1>
             </main>
         </>
-    )
+    );
 }

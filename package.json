@@ -2,7 +2,7 @@
   "name": "wwn_sheet",
   "version": "0.1.0",
   "private": true,
-  "browserlist": [
+  "browserslist": [
     ">0.4%",
     "not dead",
     "not op_mini all"

@@ -7,7 +7,151 @@ datasource db {
   url      = env("PRISMA_DATABASE_URL")
 }
 
-model character {
-  id   String  @id @db.Uuid
-  name String? @db.VarChar(256)
+model Character {
+  id                String   @id @default(uuid())
+  class             String   @default("Not chosen") @db.VarChar(32)
+  mageTradition     String?  @db.VarChar(32)
+  species           String   @default("Human") @db.VarChar(64)
+  languages         String?  @db.VarChar(256)
+  // background   String   @default("Not chosen") @db.VarChar(64)
+  backgroundDetails String?
+  occupation        String?  @default("Not chosen") @db.VarChar(64)
+  name              String?  @default("Anonymous") @db.VarChar(256)
+  homeland          String?  @db.VarChar(256)
+  goal              String   @default("My goal is to be the very best, like no one ever was.") @db.VarChar(256)
+  description       String?
+  image             String?
+  experience        Int      @default(0)
+  unspentPoints     Int      @default(0)
+  renown            Int      @default(0)
+  hp                Int      @default(0)
+  strain            Int      @default(0)
+  totalMoney        Int[]    @default([0, 0, 0])
+  stashedMoney      Int[]    @default([0, 0, 0])
+  isAlive           Boolean  @default(true)
+  // skills
+  // stats
+  // foci
+  // spells
+  // readiedItems
+  // stowedItems
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Background {
+  backgroundId   Int      @id
+  backgroundName String
+  freeSkill      String   @db.VarChar(32)
+  quickSkills    String[] @default(["skill1", "skill2"])
+  // growth
+  // learning
+}
+
+model Stats {
+  id                   Int  @id @default(autoincrement())
+  strength             Int  @default(0)
+  strengthModifier     Int?
+  dexterity            Int  @default(0)
+  dexterityModifier    Int?
+  constitution         Int  @default(0)
+  constitutionModifier Int?
+  intelligence         Int  @default(0)
+  intelligenceModifier Int?
+  wisdom               Int  @default(0)
+  wisdomModifier       Int?
+  charisma             Int  @default(0)
+  charismaModifier     Int?
+}
+
+model Skillset {
+  id       Int  @id @default(autoincrement())
+  admin    Int?
+  connect  Int?
+  convince Int?
+  craft    Int?
+  exert    Int?
+  heal     Int?
+  know     Int?
+  lead     Int?
+  magic    Int?
+  notice   Int?
+  perform  Int?
+  pray     Int?
+  punch    Int?
+  ride     Int?
+  sail     Int?
+  shoot    Int?
+  sneak    Int?
+  stab     Int?
+  survive  Int?
+  trade    Int?
+  work     Int?
+}
+
+model Foci {
+  id                 Int  @id @default(autoincrement())
+  snipersEye         Int?
+  developedAttribute Int?
+  // etc...
+}
+
+model ClassAbilities {
+  id                 Int     @id @default(autoincrement())
+  class              String  @unique @db.VarChar(32)
+  masterfulExpertise Boolean @default(false)
+  quickLearner       Boolean @default(false)
+  arcaneTradition    Boolean @default(false)
+  killingBlow        Boolean @default(false)
+  veteransLuck       Boolean @default(false)
+}
+
+model Item {
+  itemId           Int     @id @default(autoincrement())
+  itemName         String  @unique @db.VarChar(128)
+  costSilver       Int
+  encumbrance      Int
+  quantity         Int?
+  quantityModifier String? @db.VarChar(64)
+  isWeightless     Boolean @default(false)
+  isWeightlessWorn Boolean @default(false)
+  canBeBundled     Boolean @default(false)
+}
+
+model Weapon {
+  weaponId     Int      @id @default(autoincrement())
+  weaponName   String   @unique @db.VarChar(128)
+  costSilver   Int
+  encumbrance  Int
+  attribute    String   @db.VarChar(10)
+  traits       String[]
+  shockDmg     Int?
+  shockHit     Int?
+  requiresAmmo Boolean  @default(false)
+  closeRange   Int?
+  farRange     Int?
+}
+
+model Armor {
+  armorId     Int     @id @default(autoincrement())
+  armorName   String  @unique @db.VarChar(128)
+  costSilver  Int
+  encumbrance Int
+  armorClass  Int
+  isShield    Boolean @default(false)
+}
+
+model Spell {
+  spellId     Int     @id @default(autoincrement())
+  name        String  @unique @db.VarChar(64)
+  description String
+  level       Int
+  tradition   String? @db.VarChar(32)
+}
+
+model Art {
+  artId       Int     @id @default(autoincrement())
+  name        String  @unique @db.VarChar(64)
+  description String
+  tradition   String? @db.VarChar(32)
 }

@@ -8,85 +8,106 @@ datasource db {
 }
 
 model Character {
-  id                String   @id @default(uuid())
-  class             String   @default("Not chosen") @db.VarChar(32)
-  mageTradition     String?  @db.VarChar(32)
-  species           String   @default("Human") @db.VarChar(64)
-  languages         String?  @db.VarChar(256)
-  // background   String   @default("Not chosen") @db.VarChar(64)
+  id                String     @id @default(uuid())
+  class             String     @default("Not chosen") @db.VarChar(32)
+  mageTradition     String?    @db.VarChar(32)
+  species           String     @default("Human") @db.VarChar(64)
+  languages         String[]   @default(["Native", "Trade Cant"]) @db.VarChar(32)
+  background        Background @relation(fields: [backgroundId], references: [id])
   backgroundDetails String?
-  occupation        String?  @default("Not chosen") @db.VarChar(64)
-  name              String?  @default("Anonymous") @db.VarChar(256)
-  homeland          String?  @db.VarChar(256)
-  goal              String   @default("My goal is to be the very best, like no one ever was.") @db.VarChar(256)
+  occupation        String     @default("Not chosen") @db.VarChar(64)
+  name              String     @default("Anonymous") @db.VarChar(256)
+  homeland          String?    @db.VarChar(256)
+  goal              String     @default("My goal is to be the very best, like no one ever was.") @db.VarChar(256)
   description       String?
   image             String?
-  experience        Int      @default(0)
-  unspentPoints     Int      @default(0)
-  renown            Int      @default(0)
-  hp                Int      @default(0)
-  strain            Int      @default(0)
-  totalMoney        Int[]    @default([0, 0, 0])
-  stashedMoney      Int[]    @default([0, 0, 0])
-  isAlive           Boolean  @default(true)
-  // skills
-  // stats
+  experience        Int        @default(0)
+  unspentPoints     Int        @default(0)
+  renown            Int        @default(0)
+  maxHp             Int        @default(0)
+  currentHp         Int        @default(0)
+  condition         String?    @db.VarChar(64)
+  curentStrain      Int        @default(0)
+  totalMoney        Int[]      @default([0, 0, 0])
+  stashedMoney      Int[]      @default([0, 0, 0]) // in the future column in Party table
+  isAlive           Boolean    @default(true)
+  skillset          Skillset   @relation(fields: [skillsetId], references: [id])
+  // attributes
   // foci
   // spells
   // readiedItems
   // stowedItems
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  backgroundId      Int
+  skillsetId        Int
 }
 
 model Background {
-  backgroundId   Int      @id
-  backgroundName String
-  freeSkill      String   @db.VarChar(32)
-  quickSkills    String[] @default(["skill1", "skill2"])
-  // growth
-  // learning
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(32)
+  description      String
+  Character        Character[]
+  BackgroundThrows BackgroundThrows[]
 }
 
-model Stats {
-  id                   Int  @id @default(autoincrement())
-  strength             Int  @default(0)
-  strengthModifier     Int?
-  dexterity            Int  @default(0)
-  dexterityModifier    Int?
-  constitution         Int  @default(0)
-  constitutionModifier Int?
-  intelligence         Int  @default(0)
-  intelligenceModifier Int?
-  wisdom               Int  @default(0)
-  wisdomModifier       Int?
-  charisma             Int  @default(0)
-  charismaModifier     Int?
+model BackgroundThrows {
+  id           Int        @id @default(autoincrement())
+  background   Background @relation(fields: [backgroundId], references: [id])
+  type         String     @db.VarChar(32)
+  skill        String     @db.VarChar(32)
+  countTwice   Boolean    @default(false)
+  backgroundId Int
+}
+
+model Attributes {
+  id           Int @id @default(autoincrement())
+  strength     Int @default(0)
+  dexterity    Int @default(0)
+  constitution Int @default(0)
+  intelligence Int @default(0)
+  wisdom       Int @default(0)
+  charisma     Int @default(0)
+}
+
+model AttributeValues {
+  id                 Int  @id @default(autoincrement())
+  score              Int
+  scoreBoost         Int?
+  modifier           Int?
+  developedAttribute Int?
+}
+
+model Skill {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(32)
+  description String
 }
 
 model Skillset {
-  id       Int  @id @default(autoincrement())
-  admin    Int?
-  connect  Int?
-  convince Int?
-  craft    Int?
-  exert    Int?
-  heal     Int?
-  know     Int?
-  lead     Int?
-  magic    Int?
-  notice   Int?
-  perform  Int?
-  pray     Int?
-  punch    Int?
-  ride     Int?
-  sail     Int?
-  shoot    Int?
-  sneak    Int?
-  stab     Int?
-  survive  Int?
-  trade    Int?
-  work     Int?
+  id        Int         @id @default(autoincrement())
+  admin     Int?
+  connect   Int?
+  convince  Int?
+  craft     Int?
+  exert     Int?
+  heal      Int?
+  know      Int?
+  lead      Int?
+  magic     Int?
+  notice    Int?
+  perform   Int?
+  pray      Int?
+  punch     Int?
+  ride      Int?
+  sail      Int?
+  shoot     Int?
+  sneak     Int?
+  stab      Int?
+  survive   Int?
+  trade     Int?
+  work      Int?
+  Character Character[]
 }
 
 model Foci {

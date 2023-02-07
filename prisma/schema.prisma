@@ -10,11 +10,11 @@ datasource db {
 model Character {
   id                String     @id @default(uuid())
   class             String     @default("Not chosen") @db.VarChar(32)
-  mageTradition     String?    @db.VarChar(32)
+  mageTradition     String?    @map("mage_tradition") @db.VarChar(32)
   species           String     @default("Human") @db.VarChar(64)
   languages         String[]   @default(["Native", "Trade Cant"]) @db.VarChar(32)
   background        Background @relation(fields: [backgroundId], references: [id])
-  backgroundDetails String?
+  backgroundDetails String?    @map("background_details")
   occupation        String     @default("Not chosen") @db.VarChar(64)
   name              String     @default("Anonymous") @db.VarChar(256)
   homeland          String?    @db.VarChar(256)
@@ -22,25 +22,25 @@ model Character {
   description       String?
   image             String?
   experience        Int        @default(0)
-  unspentPoints     Int        @default(0)
+  unspentPoints     Int        @default(0) @map("unspent_points")
   renown            Int        @default(0)
-  maxHp             Int        @default(0)
-  currentHp         Int        @default(0)
+  maxHp             Int        @default(0) @map("max_hp")
+  currentHp         Int        @default(0) @map("current_hp")
   condition         String?    @db.VarChar(64)
-  curentStrain      Int        @default(0)
-  totalMoney        Int[]      @default([0, 0, 0])
-  stashedMoney      Int[]      @default([0, 0, 0]) // in the future column in Party table
-  isAlive           Boolean    @default(true)
+  currentStrain     Int        @default(0) @map("current_strain")
+  totalMoney        Int[]      @default([0, 0, 0]) @map("total_money")
+  stashedMoney      Int[]      @default([0, 0, 0]) @map("stashed_money") // in the future column in Party table
+  isAlive           Boolean    @default(true) @map("is_alive")
   skillset          Skillset   @relation(fields: [skillsetId], references: [id])
   // attributes
   // foci
   // spells
-  // readiedItems
-  // stowedItems
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-  backgroundId      Int
-  skillsetId        Int
+  // readiedItems @map("readied_items")
+  // stowedItems @map("stowed_items")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  backgroundId      Int        @map("background_id")
+  skillsetId        Int        @map("skillset_id")
 }
 
 model Background {
@@ -56,8 +56,8 @@ model BackgroundThrows {
   background   Background @relation(fields: [backgroundId], references: [id])
   type         String     @db.VarChar(32)
   skill        String     @db.VarChar(32)
-  countTwice   Boolean    @default(false)
-  backgroundId Int
+  countTwice   Boolean    @default(false) @map("count_twice")
+  backgroundId Int        @map("background_id")
 }
 
 model Attributes {
@@ -73,14 +73,14 @@ model Attributes {
 model AttributeValues {
   id                 Int  @id @default(autoincrement())
   score              Int
-  scoreBoost         Int?
+  scoreBoost         Int? @map("score_boost")
   modifier           Int?
-  developedAttribute Int?
+  developedAttribute Int? @map("developed_attribute")
 }
 
 model Skill {
   id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(32)
+  name        String @unique @db.VarChar(32)
   description String
 }
 
@@ -110,60 +110,66 @@ model Skillset {
   Character Character[]
 }
 
-model Foci {
-  id                 Int  @id @default(autoincrement())
-  snipersEye         Int?
-  developedAttribute Int?
+model Focus {
+  id                  Int     @id @default(autoincrement())
+  name                String  @unique @db.VarChar(256)
+  baseDescription     String
+  levelOneDescription String?
+  levelTwoDescription String?
+  isExpansion         Boolean @default(false)
+
+  // snipersEye         Int? @map("snipers_eye")
+  // developedAttribute Int? @map("developed_attribute")
   // etc...
 }
 
 model ClassAbilities {
   id                 Int     @id @default(autoincrement())
   class              String  @unique @db.VarChar(32)
-  masterfulExpertise Boolean @default(false)
-  quickLearner       Boolean @default(false)
-  arcaneTradition    Boolean @default(false)
-  killingBlow        Boolean @default(false)
-  veteransLuck       Boolean @default(false)
+  masterfulExpertise Boolean @default(false) @map("masterful_expertise")
+  quickLearner       Boolean @default(false) @map("quick_learner")
+  arcaneTradition    Boolean @default(false) @map("arcane_tradition")
+  killingBlow        Boolean @default(false) @map("killing_blow")
+  veteransLuck       Boolean @default(false) @map("veterans_luck")
 }
 
 model Item {
-  itemId           Int     @id @default(autoincrement())
-  itemName         String  @unique @db.VarChar(128)
-  costSilver       Int
+  id               Int     @id @default(autoincrement())
+  name             String  @unique @db.VarChar(128)
+  costSilver       Int     @map("cost_silver")
   encumbrance      Int
   quantity         Int?
-  quantityModifier String? @db.VarChar(64)
-  isWeightless     Boolean @default(false)
-  isWeightlessWorn Boolean @default(false)
-  canBeBundled     Boolean @default(false)
+  quantityModifier String? @map("quantity_modifier") @db.VarChar(64)
+  isWeightless     Boolean @default(false) @map("is_weightless")
+  isWeightlessWorn Boolean @default(false) @map("is_weightless_worn")
+  canBeBundled     Boolean @default(false) @map("can_be_bundled")
 }
 
 model Weapon {
-  weaponId     Int      @id @default(autoincrement())
-  weaponName   String   @unique @db.VarChar(128)
-  costSilver   Int
+  id           Int      @id @default(autoincrement())
+  name         String   @unique @db.VarChar(128)
+  costSilver   Int      @map("cost_silver")
   encumbrance  Int
   attribute    String   @db.VarChar(10)
   traits       String[]
-  shockDmg     Int?
-  shockHit     Int?
-  requiresAmmo Boolean  @default(false)
-  closeRange   Int?
-  farRange     Int?
+  shockDmg     Int?     @map("shock_dmg")
+  shockHit     Int?     @map("shock_hit")
+  requiresAmmo Boolean  @default(false) @map("requires_ammo")
+  closeRange   Int?     @map("close_range")
+  farRange     Int?     @map("far_range")
 }
 
 model Armor {
-  armorId     Int     @id @default(autoincrement())
-  armorName   String  @unique @db.VarChar(128)
-  costSilver  Int
+  id          Int     @id @default(autoincrement())
+  name        String  @unique @db.VarChar(128)
+  costSilver  Int     @map("cost_silver")
   encumbrance Int
-  armorClass  Int
-  isShield    Boolean @default(false)
+  armorClass  Int     @map("armor_class")
+  isShield    Boolean @default(false) @map("is_shield")
 }
 
 model Spell {
-  spellId     Int     @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String  @unique @db.VarChar(64)
   description String
   level       Int
@@ -171,7 +177,7 @@ model Spell {
 }
 
 model Art {
-  artId       Int     @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String  @unique @db.VarChar(64)
   description String
   tradition   String? @db.VarChar(32)

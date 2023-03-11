@@ -7,7 +7,248 @@ datasource db {
   url      = env("PRISMA_DATABASE_URL")
 }
 
-model character {
-  id   String  @id @db.Uuid
-  name String? @db.VarChar(256)
+enum Class {
+  NONE
+  WARRIOR
+  EXPERT
+  MAGE
+  ADVENTURER
+}
+
+model Character {
+  id                String                  @id @default(uuid())
+  class             Class                   @default(NONE)
+  classAbilities    ClassAbility[]
+  mageTradition     String?                 @map("mage_tradition") @db.VarChar(32)
+  species           String                  @default("Human") @db.VarChar(64)
+  languages         String[]                @default(["Native", "Trade Cant"]) @db.VarChar(32)
+  assets            String?
+  notes             String?
+  background        Background              @relation(fields: [backgroundId], references: [id])
+  backgroundDetails String?                 @map("background_details")
+  occupation        String                  @default("Not chosen") @db.VarChar(64)
+  name              String                  @default("Anonymous") @db.VarChar(256)
+  homeland          String?                 @db.VarChar(256)
+  goal              String                  @default("My goal is to be the very best, like no one ever was.") @db.VarChar(256)
+  description       String?
+  image             String?
+  experience        Int                     @default(0)
+  unspentPoints     Int                     @default(0) @map("unspent_points")
+  renown            Int                     @default(0)
+  maxHp             Int                     @default(1) @map("max_hp")
+  currentHp         Int                     @default(1) @map("current_hp")
+  condition         String?                 @db.VarChar(64)
+  currentStrain     Int                     @default(0) @map("current_strain")
+  totalMoney        Int[]                   @default([0, 0, 0]) @map("total_money")
+  stashedMoney      Int[]                   @default([0, 0, 0]) @map("stashed_money") // in the future column in Party table
+  isAlive           Boolean                 @default(true) @map("is_alive")
+  skillset          Skillset                @relation(fields: [skillsetId], references: [id])
+  attributes        Attributes              @relation(fields: [attributesId], references: [id])
+  foci              Focus[]
+  spells            Spell[]
+  arts              Art[]
+  equipment         EquipmentOnCharacters[]
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+  backgroundId      Int                     @map("background_id")
+  skillsetId        Int                     @map("skillset_id")
+  attributesId      Int                     @map("attributes_id")
+
+  @@map("character")
+}
+
+model ClassAbility {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(64)
+  description String
+  character   Character[]
+
+  @@map("class_ability")
+}
+
+model EquipmentOnCharacters {
+  character   Character @relation(fields: [characterId], references: [id])
+  characterId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  equipmentId Int
+  isStowed    Boolean   @default(true)
+
+  @@id([characterId, equipmentId])
+  @@map("equipment_on_characters")
+}
+
+model Equipment {
+  id          Int                     @id @default(autoincrement())
+  name        String                  @unique @db.VarChar(128)
+  costSilver  Int                     @map("cost_silver")
+  encumbrance Int
+  weapon      Weapon?                 @relation(fields: [weaponId], references: [id])
+  item        Item?                   @relation(fields: [itemId], references: [id])
+  armor       Armor?                  @relation(fields: [armorId], references: [id])
+  weaponId    Int?                    @map("weapon_id")
+  itemId      Int?                    @map("item_id")
+  armorId     Int?                    @map("armor_id")
+  characters  EquipmentOnCharacters[]
+
+  @@map("equipment")
+}
+
+model Item {
+  id               Int         @id @default(autoincrement())
+  quantity         Int?
+  quantityModifier String?     @map("quantity_modifier") @db.VarChar(64)
+  isWeightless     Boolean     @default(false) @map("is_weightless")
+  isWeightlessWorn Boolean     @default(false) @map("is_weightless_worn")
+  canBeBundled     Boolean     @default(false) @map("can_be_bundled")
+  equipment        Equipment[]
+
+  @@map("item")
+}
+
+model Weapon {
+  id           Int         @id @default(autoincrement())
+  attribute    String      @db.VarChar(10)
+  traits       String[]
+  shockDmg     Int?        @map("shock_dmg")
+  shockHit     Int?        @map("shock_hit")
+  requiresAmmo Boolean     @default(false) @map("requires_ammo")
+  closeRange   Int?        @map("close_range")
+  farRange     Int?        @map("far_range")
+  equipment    Equipment[]
+
+  @@map("weapon")
+}
+
+model Armor {
+  id         Int         @id @default(autoincrement())
+  armorClass Int         @map("armor_class")
+  isShield   Boolean     @default(false) @map("is_shield")
+  equipment  Equipment[]
+
+  @@map("armor")
+}
+
+model Background {
+  id               Int               @id @default(autoincrement())
+  name             String            @db.VarChar(32)
+  description      String
+  character        Character[]
+  backgroundThrows BackgroundThrow[]
+
+  @@map("background")
+}
+
+model BackgroundThrow {
+  id           Int        @id @default(autoincrement())
+  background   Background @relation(fields: [backgroundId], references: [id])
+  type         String     @db.VarChar(32)
+  skill        String     @db.VarChar(32)
+  countTwice   Boolean    @default(false) @map("count_twice")
+  backgroundId Int        @map("background_id")
+
+  @@map("background_throw")
+}
+
+model Attributes {
+  id                   Int             @id @default(autoincrement())
+  strength             AttributeValues @relation(name: "StrengthValues", fields: [strengthValuesId], references: [id])
+  dexterity            AttributeValues @relation(name: "DexterityValues", fields: [dexterityValuesId], references: [id])
+  constitution         AttributeValues @relation(name: "ConstitutionValues", fields: [constitutionValuesId], references: [id])
+  intelligence         AttributeValues @relation(name: "IntelligenceValues", fields: [intelligenceValuesId], references: [id])
+  wisdom               AttributeValues @relation(name: "WisdomValues", fields: [wisdomValuesId], references: [id])
+  charisma             AttributeValues @relation(name: "CharismaValues", fields: [charismaValuesId], references: [id])
+  strengthValuesId     Int             @map("strength_values_id")
+  dexterityValuesId    Int             @map("dexterity_values_id")
+  constitutionValuesId Int             @map("constitution_values_id")
+  intelligenceValuesId Int             @map("intelligence_values_id")
+  wisdomValuesId       Int             @map("wisdom_values_id")
+  charismaValuesId     Int             @map("charisma_values_id")
+  character            Character[]
+
+  @@map("attributes")
+}
+
+model AttributeValues {
+  id                 Int          @id @default(autoincrement())
+  score              Int
+  scoreBoost         Int?         @map("score_boost")
+  modifier           Int?
+  developedAttribute Int?         @map("developed_attribute")
+  strengthValues     Attributes[] @relation("StrengthValues")
+  dexterityValues    Attributes[] @relation("DexterityValues")
+  constitutionValues Attributes[] @relation("ConstitutionValues")
+  intelligenceValues Attributes[] @relation("IntelligenceValues")
+  wisdomValues       Attributes[] @relation("WisdomValues")
+  charismaValues     Attributes[] @relation("CharismaValues")
+
+  @@map("attribute_values")
+}
+
+model Skill {
+  id          Int    @id @default(autoincrement())
+  name        String @unique @db.VarChar(32)
+  description String
+
+  @@map("skill")
+}
+
+model Skillset {
+  id        Int         @id @default(autoincrement())
+  admin     Int?
+  connect   Int?
+  convince  Int?
+  craft     Int?
+  exert     Int?
+  heal      Int?
+  know      Int?
+  lead      Int?
+  magic     Int?
+  notice    Int?
+  perform   Int?
+  pray      Int?
+  punch     Int?
+  ride      Int?
+  sail      Int?
+  shoot     Int?
+  sneak     Int?
+  stab      Int?
+  survive   Int?
+  trade     Int?
+  work      Int?
+  character Character[]
+
+  @@map("skillset")
+}
+
+model Focus {
+  id                  Int         @id @default(autoincrement())
+  name                String      @unique @db.VarChar(256)
+  baseDescription     String      @map("base_description")
+  levelOneDescription String?     @map("level_one_description")
+  levelTwoDescription String?     @map("level_two_description")
+  isExpansion         Boolean     @default(false) @map("is_expansion")
+  character           Character[]
+
+  @@map("focus")
+}
+
+model Spell {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar(64)
+  description String
+  level       Int
+  tradition   String?     @db.VarChar(32)
+  character   Character[]
+
+  @@map("spell")
+}
+
+model Art {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar(64)
+  description String
+  tradition   String?     @db.VarChar(32)
+  character   Character[]
+
+  @@map("art")
 }

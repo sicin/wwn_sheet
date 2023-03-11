@@ -32,8 +32,8 @@ model Character {
   stashedMoney      Int[]      @default([0, 0, 0]) @map("stashed_money") // in the future column in Party table
   isAlive           Boolean    @default(true) @map("is_alive")
   skillset          Skillset   @relation(fields: [skillsetId], references: [id])
-  // attributes
-  // foci
+  attributes        Attributes @relation(fields: [attributesId], references: [id])
+  foci              Focus[]
   // spells
   // readiedItems @map("readied_items")
   // stowedItems @map("stowed_items")
@@ -41,6 +41,7 @@ model Character {
   updatedAt         DateTime   @updatedAt @map("updated_at")
   backgroundId      Int        @map("background_id")
   skillsetId        Int        @map("skillset_id")
+  attributesId      Int        @map("attributes_id")
 }
 
 model Background {
@@ -61,21 +62,34 @@ model BackgroundThrows {
 }
 
 model Attributes {
-  id           Int @id @default(autoincrement())
-  strength     Int @default(0)
-  dexterity    Int @default(0)
-  constitution Int @default(0)
-  intelligence Int @default(0)
-  wisdom       Int @default(0)
-  charisma     Int @default(0)
+  id                   Int             @id @default(autoincrement())
+  strength             AttributeValues @relation(name: "StrengthValues", fields: [strengthValuesId], references: [id])
+  dexterity            AttributeValues @relation(name: "DexterityValues", fields: [dexterityValuesId], references: [id])
+  constitution         AttributeValues @relation(name: "ConstitutionValues", fields: [constitutionValuesId], references: [id])
+  intelligence         AttributeValues @relation(name: "IntelligenceValues", fields: [intelligenceValuesId], references: [id])
+  wisdom               AttributeValues @relation(name: "WisdomValues", fields: [wisdomValuesId], references: [id])
+  charisma             AttributeValues @relation(name: "CharismaValues", fields: [charismaValuesId], references: [id])
+  strengthValuesId     Int             @map("strength_values_id")
+  dexterityValuesId    Int             @map("dexterity_values_id")
+  constitutionValuesId Int             @map("constitution_values_id")
+  intelligenceValuesId Int             @map("intelligence_values_id")
+  wisdomValuesId       Int             @map("wisdom_values_id")
+  charismaValuesId     Int             @map("charisma_values_id")
+  Character            Character[]
 }
 
 model AttributeValues {
-  id                 Int  @id @default(autoincrement())
+  id                 Int          @id @default(autoincrement())
   score              Int
-  scoreBoost         Int? @map("score_boost")
+  scoreBoost         Int?         @map("score_boost")
   modifier           Int?
-  developedAttribute Int? @map("developed_attribute")
+  developedAttribute Int?         @map("developed_attribute")
+  strengthValues     Attributes[] @relation("StrengthValues")
+  dexterityValues    Attributes[] @relation("DexterityValues")
+  constitutionValues Attributes[] @relation("ConstitutionValues")
+  intelligenceValues Attributes[] @relation("IntelligenceValues")
+  wisdomValues       Attributes[] @relation("WisdomValues")
+  charismaValues     Attributes[] @relation("CharismaValues")
 }
 
 model Skill {
@@ -111,16 +125,13 @@ model Skillset {
 }
 
 model Focus {
-  id                  Int     @id @default(autoincrement())
-  name                String  @unique @db.VarChar(256)
-  baseDescription     String
-  levelOneDescription String?
-  levelTwoDescription String?
-  isExpansion         Boolean @default(false)
-
-  // snipersEye         Int? @map("snipers_eye")
-  // developedAttribute Int? @map("developed_attribute")
-  // etc...
+  id                  Int         @id @default(autoincrement())
+  name                String      @unique @db.VarChar(256)
+  baseDescription     String      @map("base_description")
+  levelOneDescription String?     @map("level_one_description")
+  levelTwoDescription String?     @map("level_two_description")
+  isExpansion         Boolean     @default(false) @map("is_expansion")
+  Character           Character[]
 }
 
 model ClassAbilities {

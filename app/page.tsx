@@ -1,4 +1,4 @@
-import { Averia_Sans_Libre } from '@next/font/google';
+import { Averia_Sans_Libre } from "next/font/google";
 
 const averia = Averia_Sans_Libre({ weight: ['400', '700'], subsets: ['latin'] });
 // `app/page.js` is the UI for the root `/` URL

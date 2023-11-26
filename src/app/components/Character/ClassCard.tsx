@@ -1,3 +1,5 @@
+"use client";
+
 import { Class } from "@prisma/client";
 import { FC } from "react";
 

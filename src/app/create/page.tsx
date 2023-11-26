@@ -4,6 +4,6 @@ export const metadata: Metadata = {
   title: "Character Sheet",
 };
 
-export default function CharacterSheet() {
+export default function CreateCharacter() {
   return <div>ss</div>;
 }

@@ -23,13 +23,13 @@ export const Navbar = () => {
           <li className="mr-6">
             <Link
               className={`${
-                pathname === "/foci"
+                pathname === "/dev"
                   ? "bg-blue-950 text-blue-200"
                   : "text-gray-800"
               } hover:text-blue-800`}
-              href="/foci"
+              href="/dev"
             >
-              Foci
+              Dev Tools
             </Link>
           </li>
           <li className="mr-6">

@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-import { FocusCard } from "../components/Focus/FocusCard";
+import { FocusCard } from "../../components/Focus/FocusCard";
 
 export const metadata: Metadata = {
   title: "Foci",

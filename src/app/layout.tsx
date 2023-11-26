@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Averia_Sans_Libre } from "next/font/google";
+import { Navbar } from "./components/Navigation/Navbar";
+
 import "./globals.css";
 
 const averia = Averia_Sans_Libre({
@@ -25,7 +27,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={averia.className}>{children}</body>
+      <body className={averia.className}>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }

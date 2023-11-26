@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Averia_Sans_Libre } from "next/font/google";
 import "./globals.css";
 
@@ -8,8 +8,14 @@ const averia = Averia_Sans_Libre({
 });
 
 export const metadata: Metadata = {
-  title: "WWN_SHEET App",
+  title: "WWN Character Sheet",
   description: "Worlds Without Number Character Sheet",
+  authors: { name: "Ryszard Siciński" },
+  icons: { icon: "./favicon.ico" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "white",
 };
 
 export default function RootLayout({
@@ -19,14 +25,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <title>Layout.tsx</title>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="author" content="Richard Sicinski" />
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="theme-color" content="#ffffff" />
-      </head>
       <body className={averia.className}>{children}</body>
     </html>
   );

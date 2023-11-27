@@ -1,3 +1,9 @@
+## generate prisma client
+
+```bash
+npx prisma generate dev
+```
+
 ## Send prisma schema to database
 
 ```bash
@@ -14,6 +20,12 @@ npm run dev
 
 ```bash
 npx prisma studio
+```
+
+## Synchronize prisma with db
+
+```bash
+npx prisma db pull
 ```
 
 ## Deploy on Vercel

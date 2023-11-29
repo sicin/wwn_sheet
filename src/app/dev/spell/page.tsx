@@ -1,4 +1,4 @@
-import { SpellCard } from "@/app/components/Spell/SpellCard";
+import { SpellCard } from "@/app/dev/spell/SpellCard";
 import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 

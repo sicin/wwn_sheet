@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { ArtCard } from "@/app/components/Art/ArtCard";
+import { ArtCard } from "@/app/dev/art/ArtCard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -2,9 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import * as z from "zod";
-import prisma from "@/lib/prisma";
+import { PostFocus } from "@/app/api/create/PostFocus";
 
 const schema = z.object({
   name: z.string().min(1, { message: "Required" }),
@@ -21,14 +20,14 @@ export const FocusForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormData) => {
-    "use server";
+    const createdFocus = await PostFocus(data);
 
-    const focuses = await prisma.focus.create(data);
+    console.log("Created focus:", createdFocus);
   };
 
   return (
@@ -63,11 +62,11 @@ export const FocusForm = () => {
       {errors.levelTwoDescription?.message && (
         <p>{errors.levelTwoDescription?.message.toString()}</p>
       )}
-      {/* <input
+      <input
         className="border-2 border-black bg-slate-200"
-        type="radio"
+        type="checkbox"
         {...register("isExpansion")}
-      /> */}
+      />
       <button className=" bg-slate-100" type="submit">
         Submit
       </button>

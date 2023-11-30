@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-// import { FocusCard } from "./FocusCard";
+import { FocusForm } from "./FocusForm";
 
 export const metadata: Metadata = {
   title: "Create a focus",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 
 export default async function CreateFocus() {
   const focuses = await prisma.focus.findMany({ orderBy: { id: "desc" } });
-  return <div>asd</div>;
+  return <FocusForm />;
 }

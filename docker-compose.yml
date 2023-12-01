@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  wwn-sheet-db:
+    image: postgres:16.1-alpine3.18
+    ports:
+      - 5435:5432
+    restart: always
+    volumes:
+      - wwn-sheet-db:/var/lib/postgresql/data
+    container_name: wwn-sheet-db
+    environment:
+      POSGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+volumes:
+  wwn-sheet-db:

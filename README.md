@@ -25,7 +25,7 @@ npx prisma studio
 ## Synchronize prisma with db
 
 ```bash
-npx prisma db pull
+npx prisma db push
 ```
 
 ## Deploy on Vercel

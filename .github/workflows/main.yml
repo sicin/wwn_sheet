@@ -12,8 +12,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# env:
-#   API_KEY: ${{ secrets.API_KEY }}
+env:
+  PRISMA_DATABASE_URL: ${{ secrets.PRISMA_DATABASE_URL }}
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:

@@ -17,7 +17,7 @@ import { FC } from "react";
 //   characterClass: string;
 // }
 
-export const ClassCard: FC<{ characterClass: Class }> = ({
+export const ClassCard: FC<{ characterClass?: Class }> = ({
   characterClass,
 }) => {
   return (

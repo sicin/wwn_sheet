@@ -96,6 +96,12 @@ export const CreateCharacter = () => {
         <div>Stats:</div>
         <div>{modifiersToAttributes(attributes)}</div>
         <div>Background:</div>
+        {step === 3 && (
+          <>
+            <div>{selectedBackground?.name}</div>
+            <div>{selectedBackground?.description}</div>
+          </>
+        )}
       </div>
       <div>
         {step === 0 && (

@@ -12,7 +12,6 @@ export const multiThrow = (n: number, throwFn: () => number) => {
   let total = 0;
   while (counter < n) {
     total += throwFn();
-    console.log("throw");
     counter += 1;
   }
   return total;

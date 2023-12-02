@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Averia_Sans_Libre } from "next/font/google";
-import { Navbar } from "./components/Navigation/Navbar";
+import { Navbar } from "../components/Navigation/Navbar";
 
 import "./globals.css";
 

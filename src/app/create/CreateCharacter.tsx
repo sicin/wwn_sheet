@@ -3,6 +3,7 @@
 import { d6Throw, multiThrow } from "@/lib/diceThrows";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { getAllBackgrounds } from "../api/backgrounds/getAllBackgrounds";
+import { GetFreeSkill } from "../api/throws/get/GetFreeSkill";
 
 interface Attributes {
   str: number;
@@ -17,20 +18,29 @@ interface Background {
   id: number;
   name: string;
   description: string;
+  freeSkillId: number;
 }
 
-const calculateModifier = (value: number): string => {
-  if (value === 3) return "-2";
-  if (value >= 4 && value <= 7) return "-1";
-  if (value >= 13 && value <= 17) return "+1";
-  if (value === 18) return "+2";
-  return "0";
+type Skills = {
+  [key: string]: number;
+};
+
+const calculateModifier = (value: number): number => {
+  if (value === 3) return -2;
+  if (value >= 4 && value <= 7) return -1;
+  if (value >= 13 && value <= 17) return 1;
+  if (value === 18) return 2;
+  return 0;
 };
 
 const modifiersToAttributes = (attributes: Attributes): string => {
   const attributesStringArray = Object.entries(attributes).map(
     ([key, value]) =>
-      `${key}: [score: ${value}, modifier: ${calculateModifier(value)}]`,
+      `${key}: [score: ${value}, modifier: ${
+        calculateModifier(value) > 0
+          ? `+${calculateModifier(value)}`
+          : calculateModifier(value)
+      }]`,
   );
   return attributesStringArray.join(", ");
 };
@@ -44,6 +54,7 @@ export const CreateCharacter = () => {
     cha: 0,
     int: 0,
   });
+  const [skills, setSkills] = useState<Skills>({});
   const [selectedAttribute, setSelectedAttribute] = useState<
     string | undefined
   >(undefined);
@@ -88,6 +99,13 @@ export const CreateCharacter = () => {
     );
     setSelectedBackground(selected);
   };
+  const handleChooseBackground = async () => {
+    if (selectedBackground) {
+      const freeSkill = await GetFreeSkill(selectedBackground.freeSkillId);
+      setSkills({ [freeSkill.name]: 0 });
+    }
+    setStep(3);
+  };
 
   return (
     <div className="flex flex-col">
@@ -95,11 +113,19 @@ export const CreateCharacter = () => {
         <div>New Character</div>
         <div>Stats:</div>
         <div>{modifiersToAttributes(attributes)}</div>
-        <div>Background:</div>
-        {step === 3 && (
+        {step >= 3 && (
           <>
+            <div>Background:</div>
             <div>{selectedBackground?.name}</div>
             <div>{selectedBackground?.description}</div>
+            <div>Skills:</div>
+            {Object.keys(skills).map((skill) => (
+              <div key={skill}>
+                <div>
+                  {skill}: {skills[skill]}
+                </div>
+              </div>
+            ))}
           </>
         )}
       </div>
@@ -157,7 +183,7 @@ export const CreateCharacter = () => {
                 <p>{selectedBackground.description}</p>
                 <button
                   //   disabled={!selectedBackground}
-                  onClick={() => setStep(3)}
+                  onClick={handleChooseBackground}
                 >
                   Confirm your choice
                 </button>
@@ -170,7 +196,7 @@ export const CreateCharacter = () => {
             Choose one:
             <div className="flex w-1/2 flex-col gap-4">
               <button
-                onSubmit={() => console.log("p")}
+                onClick={() => console.log("p")}
                 className="border-2 border-black"
               >
                 Gain the background&apos;s listed quick skills. Choose this if
@@ -178,7 +204,7 @@ export const CreateCharacter = () => {
                 to bother more with it.
               </button>
               <button
-                onSubmit={() => console.log("p")}
+                onClick={() => console.log("p")}
                 className="border-2 border-black"
               >
                 Pick two skills from the background&apos;s Learning table,
@@ -186,7 +212,7 @@ export const CreateCharacter = () => {
                 have specific preferences for your PC&apos;s skills.
               </button>
               <button
-                onSubmit={() => console.log("p")}
+                onClick={() => console.log("p")}
                 className="border-2 border-black"
               >
                 Roll three times, splitting the rolls as you wish between the

@@ -15,9 +15,15 @@ enum Class {
   ADVENTURER
 }
 
+enum SkillOrAttribute {
+  SKILL
+  ATTRIBUTE
+}
+
 model Character {
   id                String                  @id @default(uuid())
   class             Class                   @default(NONE)
+  secondaryClass    Class?                  @default(NONE)
   classAbilities    ClassAbility[]
   mageTradition     String?                 @map("mage_tradition") @db.VarChar(32)
   species           String                  @default("Human") @db.VarChar(64)
@@ -129,22 +135,29 @@ model Armor {
 }
 
 model Background {
-  id               Int               @id @default(autoincrement())
-  name             String            @unique @db.VarChar(32)
-  description      String
-  character        Character[]
-  backgroundThrows BackgroundThrow[]
+  id             Int               @id @default(autoincrement())
+  name           String            @unique @db.VarChar(32)
+  description    String
+  character      Character[]
+  freeSkillId    Int
+  freeSkill      BackgroundThrow   @relation(name: "FreeSkill", fields: [freeSkillId], references: [id])
+  quickSkills    BackgroundThrow[] @relation(name: "QuickSkills")
+  growthThrows   BackgroundThrow[] @relation(name: "GrowthThrows")
+  learningThrows BackgroundThrow[] @relation(name: "LearningThrows")
 
   @@map("background")
 }
 
 model BackgroundThrow {
-  id           Int        @id @default(autoincrement())
-  background   Background @relation(fields: [backgroundId], references: [id])
-  type         String     @db.VarChar(32)
-  skill        String     @db.VarChar(32)
-  countTwice   Boolean    @default(false) @map("count_twice")
-  backgroundId Int        @map("background_id")
+  id                       Int              @id @default(autoincrement())
+  type                     SkillOrAttribute
+  name                     String           @db.VarChar(32)
+  weight                   Int              @default(1)
+  countTwice               Boolean          @default(false) @map("count_twice")
+  freeSkillBackground      Background[]     @relation(name: "FreeSkill")
+  quickSkillBackgrounds    Background[]     @relation(name: "QuickSkills")
+  growthThrowBackgrounds   Background[]     @relation(name: "GrowthThrows")
+  learningThrowBackgrounds Background[]     @relation(name: "LearningThrows")
 
   @@map("background_throw")
 }

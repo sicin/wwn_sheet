@@ -13,18 +13,18 @@ const schema = z.object({
   isExpansion: z.boolean().default(false),
 });
 
-type FormData = z.infer<typeof schema>;
+export type FocusFormData = z.infer<typeof schema>;
 
 export const FocusForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<FocusFormData>({
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FocusFormData) => {
     const createdFocus = await PostFocus(data);
 
     console.log("Created focus:", createdFocus);

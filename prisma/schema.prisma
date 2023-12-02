@@ -130,7 +130,7 @@ model Armor {
 
 model Background {
   id               Int               @id @default(autoincrement())
-  name             String            @db.VarChar(32)
+  name             String            @unique @db.VarChar(32)
   description      String
   character        Character[]
   backgroundThrows BackgroundThrow[]

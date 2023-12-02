@@ -1,7 +1,8 @@
 "use client";
 
 import { d6Throw, multiThrow } from "@/lib/diceThrows";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { getAllBackgrounds } from "../api/backgrounds/getAllBackgrounds";
 
 interface Attributes {
   str: number;
@@ -38,6 +39,13 @@ export const CreateCharacter = () => {
     int: 0,
   });
   const [step, setStep] = useState<number>(0);
+  const [backgrounds, setBackgrounds] = useState<
+    {
+      id: number;
+      name: string;
+      description: string;
+    }[]
+  >([]);
   const onButtonClick = () => {
     const lol = {
       ...attributes,
@@ -51,9 +59,20 @@ export const CreateCharacter = () => {
     setAttributes(lol);
     setStep(1);
   };
+  const getBackgrounds = useCallback(async () => {
+    const lol = await getAllBackgrounds();
+    setBackgrounds(lol);
+  }, []);
+
+  useEffect(() => {
+    if (step === 2) {
+      getBackgrounds();
+    }
+  }, [step, getBackgrounds]);
 
   const chooseAttributeToImprove = (e: ChangeEvent<HTMLSelectElement>) => {
     setAttributes({ ...attributes, [e.target.value]: 14 });
+
     setStep(2);
   };
 
@@ -82,7 +101,56 @@ export const CreateCharacter = () => {
           </select>
         </>
       )}
-      {step === 2 && <div></div>}
+      {step === 2 && (
+        <div>
+          <label htmlFor="backgroundSelect">Choose background:</label>
+          <select
+            disabled={step !== 2}
+            onChange={() => alert("sad")}
+            name="background"
+            id="backgroundSelect"
+          >
+            {Object.keys(attributes).map((attribute) => (
+              <option value={attribute} key={attribute}>
+                {attribute}
+              </option>
+            ))}
+          </select>
+          <div>{JSON.stringify(backgrounds)}</div>
+        </div>
+      )}
+      {step === 3 && (
+        <div>
+          Choose one:
+          <div className="flex w-1/2 flex-col gap-4">
+            <button
+              onSubmit={() => console.log("p")}
+              className="border-2 border-black"
+            >
+              Gain the background&apos;s listed quick skills. Choose this if you
+              just want the common skills of the role and don&apos;t want to
+              bother more with it.
+            </button>
+            <button
+              onSubmit={() => console.log("p")}
+              className="border-2 border-black"
+            >
+              Pick two skills from the background&apos;s Learning table, except
+              for the &quot;Any Skill&quot; choice. Choose this if you have
+              specific preferences for your PC&apos;s skills.
+            </button>
+            <button
+              onSubmit={() => console.log("p")}
+              className="border-2 border-black"
+            >
+              Roll three times, splitting the rolls as you wish between the
+              Growth and Learning tables for your background. Choose this if you
+              don&apos;t mind accepting the dice&apos;s decision in exchange for
+              an extra skill or a chance at improved attributes.
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

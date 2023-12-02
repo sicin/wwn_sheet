@@ -1,9 +1,14 @@
 import { Metadata } from "next";
+import { CreateCharacter } from "./CreateCharacter";
 
 export const metadata: Metadata = {
   title: "Character Sheet",
 };
 
-export default function CreateCharacter() {
-  return <div>ss</div>;
+export default function Create() {
+  return (
+    <div>
+      <CreateCharacter />
+    </div>
+  );
 }

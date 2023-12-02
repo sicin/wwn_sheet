@@ -6,4 +6,14 @@ export const d10Throw = () => Math.floor(Math.random() * 10) + 1;
 export const d12Throw = () => Math.floor(Math.random() * 12) + 1;
 export const d20Throw = () => Math.floor(Math.random() * 20) + 1;
 
-export const doubleThrow = (throwFn: () => number) => throwFn() + throwFn();
+// export const doubleThrow = (throwFn: () => number) => throwFn() + throwFn();
+export const multiThrow = (n: number, throwFn: () => number) => {
+  let counter = 0;
+  let total = 0;
+  while (counter < n) {
+    total += throwFn();
+    console.log("throw");
+    counter += 1;
+  }
+  return total;
+};

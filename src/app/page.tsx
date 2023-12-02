@@ -1,11 +1,11 @@
-import { d6Throw, doubleThrow } from "@/lib/diceThrows";
+import { d6Throw, multiThrow } from "@/lib/diceThrows";
 
 export default function Home() {
-  const randomThrow = doubleThrow(d6Throw);
+  const randomThrow = multiThrow(2, d6Throw);
 
   return (
     <main>
-      <h2>Random 2xd6 throw: {randomThrow}</h2>
+      <h2>Random 2d6 throw: {randomThrow}</h2>
     </main>
   );
 }

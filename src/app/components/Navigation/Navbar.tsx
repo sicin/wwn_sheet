@@ -46,7 +46,11 @@ export const Navbar = () => {
           </li>
           <li className="mr-6">
             <Link
-              className="pointer-events-none cursor-not-allowed text-gray-100"
+              className={`${
+                pathname === "/char-sheet"
+                  ? "bg-blue-950 text-blue-200"
+                  : "text-gray-800"
+              } hover:text-blue-800`}
               href="/char-sheet"
             >
               Character Sheet

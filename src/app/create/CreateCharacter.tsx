@@ -1,6 +1,8 @@
 "use client";
 
 import { d6Throw, multiThrow } from "@/lib/diceThrows";
+import { mapClassToTable } from "@/lib/mapClassToTable";
+import { Class, Focus } from "@prisma/client";
 import {
   ChangeEvent,
   MouseEvent,
@@ -62,6 +64,10 @@ export const CreateCharacter = () => {
     int: 0,
   });
   const [skills, setSkills] = useState<Skills>({});
+  const [characterClass, setCharacterClass] = useState<Class>("NONE");
+  const [hp, setHp] = useState(0);
+  const [attackBonus, setAttackBonus] = useState(0);
+  const [foci, setFoci] = useState<Focus[]>();
   const [selectedAttribute, setSelectedAttribute] = useState<
     string | undefined
   >(undefined);
@@ -142,6 +148,10 @@ export const CreateCharacter = () => {
   const handleClassChoice = async (e: MouseEvent<HTMLButtonElement>) => {
     switch (e.currentTarget.name) {
       case "warrior":
+        setCharacterClass("WARRIOR");
+        const warriorTable = mapClassToTable("WARRIOR", 1);
+        setHp(warriorTable.hitDice);
+        setAttackBonus(warriorTable.attackBonus);
         break;
       case "expert":
       case "mage":
@@ -171,6 +181,18 @@ export const CreateCharacter = () => {
                 </div>
               </div>
             ))}
+            <div>Character class:</div>
+            <div>{characterClass}</div>
+            <div>Max HP:</div>
+            <div>{hp}</div>
+            <div>Attack bonus:</div>
+            <div>+{attackBonus}</div>
+            <div>Class abilities:</div>
+            <div></div>
+            <div>Foci:</div>
+            <div>
+              {foci?.map((focus) => <div key={focus.name}>{focus.name}</div>)}
+            </div>
           </>
         )}
       </div>

@@ -9,5 +9,6 @@ export const GetFreeSkill = async (
   const backgroundThrow = await prisma.backgroundThrow.findUniqueOrThrow({
     where: { id: backgroundThrowId },
   });
+  // .freeSkillBackground();
   return backgroundThrow;
 };

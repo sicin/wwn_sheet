@@ -1,9 +1,16 @@
 "use client";
 
 import { d6Throw, multiThrow } from "@/lib/diceThrows";
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { getAllBackgrounds } from "../api/backgrounds/getAllBackgrounds";
 import { GetFreeSkill } from "../api/throws/get/GetFreeSkill";
+import { GetQuickSkills } from "../api/throws/get/GetQuickSkills";
 
 interface Attributes {
   str: number;
@@ -63,15 +70,19 @@ export const CreateCharacter = () => {
   const [selectedBackground, setSelectedBackground] = useState<
     Background | undefined
   >(undefined);
-  const onButtonClick = () => {
-    const newAttributes = Object.keys(attributes).reduce(
-      (result, attribute) => {
-        result[attribute as keyof Attributes] = multiThrow(3, d6Throw);
-        return result;
-      },
-      {} as Attributes,
-    );
-    setAttributes(newAttributes);
+  const onButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    if (e.currentTarget.name === "roll") {
+      const newAttributes = Object.keys(attributes).reduce(
+        (result, attribute) => {
+          result[attribute as keyof Attributes] = multiThrow(3, d6Throw);
+          return result;
+        },
+        {} as Attributes,
+      );
+      setAttributes(newAttributes);
+    } else {
+      const presetAttributes = [14, 12, 11, 10, 9, 7];
+    }
     setStep(1);
   };
   const getBackgrounds = useCallback(async () => {
@@ -107,6 +118,40 @@ export const CreateCharacter = () => {
     setStep(3);
   };
 
+  const fetchQuickSkills = async (e: MouseEvent<HTMLButtonElement>) => {
+    switch (e.currentTarget.name) {
+      case "quick":
+        if (selectedBackground) {
+          const quickSkillsArray = await GetQuickSkills(selectedBackground?.id);
+          setSkills((skills) => ({
+            ...skills,
+            ...Object.fromEntries(
+              quickSkillsArray.map((skill) => [skill.name, 0]),
+            ),
+          }));
+        }
+        break;
+      case "pick":
+      case "roll":
+      default:
+        break;
+    }
+    setStep(4);
+  };
+
+  const handleClassChoice = async (e: MouseEvent<HTMLButtonElement>) => {
+    switch (e.currentTarget.name) {
+      case "warrior":
+        break;
+      case "expert":
+      case "mage":
+      case "adventurer":
+      default:
+        break;
+    }
+    setStep(5);
+  };
+
   return (
     <div className="flex flex-col">
       <div>
@@ -131,9 +176,24 @@ export const CreateCharacter = () => {
       </div>
       <div>
         {step === 0 && (
-          <button disabled={step !== 0} onClick={onButtonClick}>
-            Create new character
-          </button>
+          <div className="flex w-1/2 flex-col gap-4">
+            <button
+              name="roll"
+              disabled={step !== 0}
+              onClick={onButtonClick}
+              className="border-2 border-black"
+            >
+              Roll 3d6 six times and assign them in order
+            </button>
+            <button
+              name="assign"
+              disabled={true}
+              onClick={onButtonClick}
+              className="border-2 border-black"
+            >
+              use an array of 14, 12, 11, 10, 9, 7 assigned as you wish
+            </button>
+          </div>
         )}
         {step === 1 && (
           <>
@@ -196,7 +256,8 @@ export const CreateCharacter = () => {
             Choose one:
             <div className="flex w-1/2 flex-col gap-4">
               <button
-                onClick={() => console.log("p")}
+                name="quick"
+                onClick={fetchQuickSkills}
                 className="border-2 border-black"
               >
                 Gain the background&apos;s listed quick skills. Choose this if
@@ -204,7 +265,9 @@ export const CreateCharacter = () => {
                 to bother more with it.
               </button>
               <button
-                onClick={() => console.log("p")}
+                disabled={true}
+                name="pick"
+                onClick={fetchQuickSkills}
                 className="border-2 border-black"
               >
                 Pick two skills from the background&apos;s Learning table,
@@ -212,7 +275,9 @@ export const CreateCharacter = () => {
                 have specific preferences for your PC&apos;s skills.
               </button>
               <button
-                onClick={() => console.log("p")}
+                disabled={true}
+                name="roll"
+                onClick={fetchQuickSkills}
                 className="border-2 border-black"
               >
                 Roll three times, splitting the rolls as you wish between the
@@ -221,6 +286,42 @@ export const CreateCharacter = () => {
                 exchange for an extra skill or a chance at improved attributes.
               </button>
             </div>
+          </div>
+        )}
+        {step === 4 && (
+          <div>
+            <div>Choose your class:</div>
+            <button
+              name="warrior"
+              onClick={handleClassChoice}
+              className="border-2 border-black"
+            >
+              Warrior
+            </button>
+            <button
+              disabled={true}
+              name="expert"
+              onClick={() => console.log("p")}
+              className="border-2 border-black"
+            >
+              Expert
+            </button>
+            <button
+              disabled={true}
+              name="mage"
+              onClick={() => console.log("p")}
+              className="border-2 border-black"
+            >
+              Mage
+            </button>
+            <button
+              disabled={true}
+              name="adventurer"
+              onClick={() => console.log("p")}
+              className="border-2 border-black"
+            >
+              Adventurer
+            </button>
           </div>
         )}
       </div>

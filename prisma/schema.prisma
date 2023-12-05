@@ -64,10 +64,12 @@ model Character {
 }
 
 model ClassAbility {
-  id          Int         @id @default(autoincrement())
-  name        String      @db.VarChar(64)
-  description String
-  character   Character[]
+  id           Int         @id @default(autoincrement())
+  name         String      @db.VarChar(64)
+  description  String
+  class        Class
+  requiresFull Boolean     @default(true) @map("requires_full")
+  character    Character[]
 
   @@map("class_ability")
 }

@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PostFocus } from "@/app/api/create/PostFocus";
+import { PostFocus } from "@/app/_api/create/PostFocus";
 
 const schema = z.object({
   name: z.string().min(1, { message: "Required" }),

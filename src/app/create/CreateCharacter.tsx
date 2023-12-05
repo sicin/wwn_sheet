@@ -2,7 +2,7 @@
 
 import { d6Throw, multiThrow } from "@/lib/diceThrows";
 import { mapClassToTable } from "@/lib/mapClassToTable";
-import { Class, Focus } from "@prisma/client";
+import { Class, ClassAbility, Focus } from "@prisma/client";
 import {
   ChangeEvent,
   MouseEvent,
@@ -10,9 +10,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { getAllBackgrounds } from "../api/backgrounds/getAllBackgrounds";
-import { GetFreeSkill } from "../api/throws/get/GetFreeSkill";
-import { GetQuickSkills } from "../api/throws/get/GetQuickSkills";
+import { getAllBackgrounds } from "../_api/backgrounds/getAllBackgrounds";
+import { getClassAbilityByClass } from "../_api/classAbility/get/getClassAbilityByClass";
+import { getAllFocuses } from "../_api/foci/get/getFocuses";
+import { GetFreeSkill } from "../_api/throws/get/GetFreeSkill";
+import { GetQuickSkills } from "../_api/throws/get/GetQuickSkills";
 
 interface Attributes {
   str: number;
@@ -67,11 +69,13 @@ export const CreateCharacter = () => {
   const [characterClass, setCharacterClass] = useState<Class>("NONE");
   const [hp, setHp] = useState(0);
   const [attackBonus, setAttackBonus] = useState(0);
-  const [foci, setFoci] = useState<Focus[]>();
+  const [foci, setFoci] = useState<Focus[]>([]);
+  const [chosenFociId, setChosenFociId] = useState<number[]>([]);
+  const [classAbilities, setClassAbilities] = useState<ClassAbility[]>([]);
   const [selectedAttribute, setSelectedAttribute] = useState<
     string | undefined
   >(undefined);
-  const [step, setStep] = useState<number>(0);
+  const [step, setStep] = useState(0);
   const [backgrounds, setBackgrounds] = useState<Background[]>([]);
   const [selectedBackground, setSelectedBackground] = useState<
     Background | undefined
@@ -96,11 +100,20 @@ export const CreateCharacter = () => {
     setBackgrounds(fetchedBackgrounds);
   }, []);
 
+  const getFocuses = useCallback(async () => {
+    const fetchedFocuses = await getAllFocuses();
+    setFoci(fetchedFocuses);
+    console.log(fetchedFocuses);
+  }, []);
+
   useEffect(() => {
     if (step === 2) {
       getBackgrounds();
     }
-  }, [step, getBackgrounds]);
+    if (step === 5) {
+      getFocuses();
+    }
+  }, [step, getBackgrounds, getFocuses]);
 
   const chooseAttributeToImprove = (e: ChangeEvent<HTMLSelectElement>) => {
     setAttributes({ ...attributes, [e.target.value]: 14 });
@@ -152,6 +165,8 @@ export const CreateCharacter = () => {
         const warriorTable = mapClassToTable("WARRIOR", 1);
         setHp(warriorTable.hitDice);
         setAttackBonus(warriorTable.attackBonus);
+        const classAbilities = await getClassAbilityByClass("WARRIOR");
+        setClassAbilities(classAbilities);
         break;
       case "expert":
       case "mage":
@@ -160,6 +175,15 @@ export const CreateCharacter = () => {
         break;
     }
     setStep(5);
+  };
+
+  const handleFocusClick = (id: number) => {
+    setChosenFociId((prevIds) =>
+      prevIds.includes(id) ? prevIds : [...prevIds, id],
+    );
+  };
+  const handleConfirmFoci = async () => {
+    setStep(6);
   };
 
   return (
@@ -188,10 +212,24 @@ export const CreateCharacter = () => {
             <div>Attack bonus:</div>
             <div>+{attackBonus}</div>
             <div>Class abilities:</div>
-            <div></div>
+            <div>
+              {classAbilities?.map((ability) => (
+                <p key={ability.name}>
+                  {ability.name}:{ability.description}
+                </p>
+              ))}
+            </div>
             <div>Foci:</div>
             <div>
-              {foci?.map((focus) => <div key={focus.name}>{focus.name}</div>)}
+              {foci?.map((focus) => (
+                <button
+                  name={focus.id.toString()}
+                  onClick={() => handleFocusClick(focus.id)}
+                  key={focus.name}
+                >
+                  {focus.name}
+                </button>
+              ))}
             </div>
           </>
         )}
@@ -345,6 +383,22 @@ export const CreateCharacter = () => {
               Adventurer
             </button>
           </div>
+        )}
+        {step === 5 && (
+          <button
+            //   disabled={!selectedBackground}
+            onClick={handleConfirmFoci}
+          >
+            Confirm your choice
+          </button>
+        )}
+        {step === 6 && (
+          <button
+            //   disabled={!selectedBackground}
+            onClick={handleConfirmFoci}
+          >
+            Confirm your choice
+          </button>
         )}
       </div>
     </div>

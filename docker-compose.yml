@@ -9,7 +9,7 @@ services:
       - wwn-sheet-db:/var/lib/postgresql/data
     container_name: wwn-sheet-db
     environment:
-      POSGRES_USER: postgres
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
 volumes:
